@@ -17,6 +17,8 @@ export const accountUser = createAsyncThunk("user/account", async () => {
     withCredentials: true,
   });
   if (response?.code === 0) {
+    localStorage.setItem("isAuth", response.data.isAuth);
+    localStorage.setItem("prePath", window.location.pathname);
     return response.data;
   } else {
     return { ...initialState };

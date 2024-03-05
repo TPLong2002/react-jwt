@@ -52,7 +52,8 @@ function Login() {
         localStorage.setItem("token", `${res.data.access_token}`);
         toast.success(res.message);
         dispatch(login({ ...res.data, isAuth: true }));
-        navigate("/role");
+        localStorage.setItem("isAuth", true);
+        navigate("/user");
       }
       if (res && +res.code !== 0) {
         toast.error(res.message);

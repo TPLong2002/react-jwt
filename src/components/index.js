@@ -1,5 +1,5 @@
 import { BrowserRouter as Router } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { publicRoutes } from "@/components/routes/publicRoute";
 import { privateRoutes } from "@/components/routes/PrivateRoute";
 import { authRoutes } from "@/components/routes/authRoute";
@@ -13,21 +13,20 @@ function App() {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
   useEffect(() => {
-    dispatch(accountUser()).then((res) =>
-      localStorage.setItem("isAuth", res.payload.isAuth)
-    );
+    dispatch(accountUser()).then((res) => {
+      localStorage.setItem("isAuth", res.payload.isAuth);
+    });
   }, []);
 
+  const isAuth = localStorage.getItem("isAuth");
+  console.log(localStorage.getItem("prePath"));
   return (
     <Router>
-      {/* <PrivateRoute />
-      <PublicRoutes />
-      <AuthRoutes /> */}
       <Routes>
-        {auth.isAuth ? (
-          privateRoutes.map((route, index) => {
-            const Layout = route.layout;
-            let Page = route.component;
+        {privateRoutes.map((route, index) => {
+          const Layout = route.layout;
+          let Page = route.component;
+          if (isAuth === "true") {
             return (
               <Route
                 key={index}
@@ -39,29 +38,36 @@ function App() {
                 }
               />
             );
-          })
-        ) : (
-          <Route path="*" element={<Navigate to={"/login"} />} />
-        )}
-        {!auth.isAuth ? (
-          authRoutes.map((route, index) => {
-            const Layout = route.layout || DefaulLayout;
-            let Page = route.component;
+          }
+          return (
+            <Route key={index} path="*" element={<Navigate to={"/login"} />} />
+          );
+        })}
+        {authRoutes.map((route, index) => {
+          const Layout = route.layout || DefaulLayout;
+          let Page = route.component;
+
+          if (isAuth === "true") {
             return (
               <Route
                 key={index}
-                path={route.path}
-                element={
-                  <Layout>
-                    <Page />
-                  </Layout>
-                }
+                path="*"
+                element={<Navigate to={`${localStorage.getItem("prePath")}`} />}
               />
             );
-          })
-        ) : (
-          <Route path="*" element={<Navigate to={"/user"} />} />
-        )}
+          }
+          return (
+            <Route
+              key={index}
+              path={route.path}
+              element={
+                <Layout>
+                  <Page />
+                </Layout>
+              }
+            />
+          );
+        })}
         {publicRoutes.map((route, index) => {
           const Layout = route.layout;
           let Page = route.component;

@@ -12,7 +12,7 @@ import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import Logout from "@/services/auth/logout";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/common/redux-toolkit/features/auth/authSlice";
@@ -36,6 +36,9 @@ function Nav() {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+  const handleClick = (url) => {
+    localStorage.setItem("prePath", url);
+  };
 
   const handleCloseUserMenu = async (index) => {
     if (index === "Logout") {
@@ -44,11 +47,14 @@ function Nav() {
     setAnchorElUser(null);
   };
 
+  const location = useLocation();
   const handleLogout = async () => {
     const res = await Logout();
     if (res.code === 0) {
       dispatch(logout());
       localStorage.removeItem("token");
+      localStorage.setItem("isAuth", false);
+      localStorage.setItem("prePath", location.pathname);
     }
   };
   return (
@@ -58,6 +64,7 @@ function Nav() {
           <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
           <NavLink
             to="/"
+            onClick={() => handleClick("/")}
             className="mr-2 font-bold tracking-wider text-xl"
             style={{ fontFamily: "monospace" }}
           >
@@ -126,7 +133,7 @@ function Nav() {
               <NavLink
                 key={page}
                 to={`/${page.toLowerCase()}`}
-                onClick={handleCloseNavMenu}
+                onClick={() => handleClick(`/${page.toLowerCase()}`)}
                 className={({ isActive }) =>
                   isActive ? "h-full border-b-4 border-white mx-2" : "mx-2"
                 }
@@ -177,14 +184,14 @@ function Nav() {
           ) : (
             <>
               <NavLink
-                href={`/login`}
+                to={`/login`}
                 onClick={handleCloseNavMenu}
                 className="my-2 text-white block"
               >
                 Login |
               </NavLink>
               <NavLink
-                href={`/register`}
+                to={`/register`}
                 onClick={handleCloseNavMenu}
                 className="my-2 text-white block"
               >
